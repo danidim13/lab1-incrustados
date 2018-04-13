@@ -1,5 +1,7 @@
 #include "msp.h"
 
+#include "Button.hpp"
+
 
 /**
  * main.c
@@ -13,13 +15,15 @@ int main(void)
     WDTCTL = WDTPW | WDTHOLD;                    /* Stop watchdog timer */
 
     P1->DIR = BIT0;
-    P1->OUT = BIT0;
+    P1->OUT = BIT0 & BIT1;
+
     // Set P4.3 for Analog input, disabling the I/O circuit.
     P4->SEL0 = BIT3;
     P4->SEL1 = BIT3;
     P4->DIR &= ~BIT3;
 
     //TIMER32_1->LOAD = 0x00B71B00; //~0.5s ---> a 48Mhz
+    /*
     TIMER32_1->LOAD = 0x0000BB80; //~0.5s ---> a 48Mhz
     TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT1_IRQn,1);
@@ -33,14 +37,24 @@ int main(void)
     ADC14->IER0 = ADC14_IER0_IE0;
     NVIC_SetPriority(ADC14_IRQn,1);
     NVIC_EnableIRQ(ADC14_IRQn);
+    */
+
+    Button *l_pButton = new Button(BUTTONS1);
+
     while (1)
     {
+        if (l_pButton->Pressed()) {
+            P1->OUT |= BIT0;
+        } else {
+            P1->OUT &= ~BIT0;
+        }
 
     }
 
+    delete l_pButton;
     return 0;
 }
-
+/*
 extern "C"
 {
     void T32_INT1_IRQHandler(void)
@@ -62,3 +76,4 @@ extern "C"
         return;
     }
 }
+*/
