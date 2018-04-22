@@ -1,12 +1,16 @@
 #include "configuracion.h"
-#include <msp.h>
+
+
+uint16_t ADC14Result = 0U;
+static uint16_t g_u16AdcCount = 0U;
 
 void ConfigPorts(){
-    // LED
+    // LED como salida
     P1->DIR = BIT0;
     P1->OUT = BIT0 & BIT1;
 
     // Set P4.3 for Analog input, disabling the I/O circuit.
+    // P4.3 (micrófono) Como entrada.
     P4->SEL0 = BIT3;
     P4->SEL1 = BIT3;
     P4->DIR &= ~BIT3;
@@ -35,12 +39,12 @@ void ConfigADC(){
      * Reloj = Master Clock (3 MHz)
      *
      * Predivisor:
-     *      [1] | 4 | [32] | 64
+     *      [1] | 4 | 32 | 64
      *
      * Divisor:
-     *      1 | 2 | 3 | 4 | [5] | 6 | 7
+     *      1 | 2 | 3 | [4] | 5 | 6 | 7
      *
-     * ---> Reloj del ADC = 600 kHz
+     * ---> Reloj del ADC = 750 kHz
      *
      * Pulse Sample Mode: Se inicia una conversión al recibir un
      * pulso (posedge) en el sample-and-hold source.
@@ -54,24 +58,28 @@ void ConfigADC(){
      * Cantidad de ciclos para muestreo:
      *      4 | 8 | 16 | 32 | [64] | 96 | 128 | 192
      *
-     * ---> Periodo de muestreo = 0.107 ms (9.375 kHz)
-     * ---> Tiempo total de conversión =
+     * ---> Periodo de muestreo = 85 us (11.718 kHz)
+     * ---> Tiempo total de conversión = 116 us (87 ciclos, 8.620 kHz)
      *
      *
      */
-    ADC14->CTL0 = ADC14_CTL0_PDIV__1 | ADC14_CTL0_SHS_0 | ADC14_CTL0_DIV__5 |
-                  ADC14_CTL0_SSEL__MCLK | ADC14_CTL0_SHT0__64 | ADC14_CTL0_ON
-                  | ADC14_CTL0_SHP;
+    ADC14->CTL0 = ADC14_CTL0_PDIV__1 | ADC14_CTL0_DIV__4 | ADC14_CTL0_SHT0__64
+                | ADC14_CTL0_SSEL__MCLK | ADC14_CTL0_SHS_0 | ADC14_CTL0_SHP
+                //| ADC14_CTL0_CONSEQ_2 | ADC14_CTL0_MSC
+                | ADC14_CTL0_ON ;
 
     /**
-     * Tension de referencia VRSel =
-     * INput CHannel =
+     * Tension de referencia VRSel:
+     *      V+ = AVCC (3.3 V) y V- = AVSS (0 V)
+     * INput CHannel = A10 (P4.3)
      */
     ADC14->MCTL[0] = ADC14_MCTLN_INCH_10 | ADC14_MCTLN_VRSEL_0;
 
-    ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_ENC; // Habilitar conversion
+    // Habilitar conversion
+    ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_ENC;
 
-    ADC14->IER0 = ADC14_IER0_IE0; // Habilitar interrupciones de MEM0
+    // Habilitar interrupciones de MEM0
+    ADC14->IER0 = ADC14_IER0_IE0;
 
     NVIC_SetPriority(ADC14_IRQn,1);
     NVIC_EnableIRQ(ADC14_IRQn);
@@ -80,21 +88,35 @@ void ConfigADC(){
 
 extern "C"
 {
+    /*
     void T32_INT1_IRQHandler(void)
     {
         __disable_irq();
         TIMER32_1->INTCLR = 0U;
-        P1->OUT ^= BIT0;
-        ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC; // Start
+
+
         __enable_irq();
         return;
-    }
+    }*/
 
+    /**
+     * Atencion de interrupcion ADC
+     *
+     */
     void ADC14_IRQHandler(void)
     {
         __disable_irq();
         ADC14Result = ADC14->MEM[0];
         ADC14->CLRIFGR0 = ADC14_CLRIFGR0_CLRIFG0;
+        ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC; // Start
+
+        g_u16AdcCount++;
+
+        // Cada segundo prender/apagar el led
+        if (g_u16AdcCount >= 8621) {
+            P1->OUT ^= BIT0;
+            g_u16AdcCount = 0;
+        }
         __enable_irq();
         return;
     }
