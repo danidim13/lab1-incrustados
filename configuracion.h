@@ -12,5 +12,6 @@
 void ConfigPorts();
 void ConfigTimer();
 void ConfigADC();
+void ConfigSensorLuz();
 
 #endif /* CONFIGURACION_H_ */
