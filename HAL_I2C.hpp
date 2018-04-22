@@ -1,6 +1,7 @@
 /*
  * HAL_I2C.hpp
  *
+ *
  *  Created on: Apr 19, 2018
  *      Author: jorge
  *      Prototipos de capa de abstraccion de hardware para I2C
