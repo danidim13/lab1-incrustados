@@ -3,6 +3,7 @@
  *
  *  Created on: Apr 19, 2018
  *      Author: jorge
+ *
  */
 
 #ifndef HAL_OPT_HPP_
@@ -33,19 +34,19 @@ M1 to M0 = Mode bits
 01 = Single shot mode
 10 = Continuous conversion (default)
 11 = Continuous conversion
-OVF (Bit 8) – Overflow flag. When set the conversion result is overflown.
-CRF (Bit 7) – Conversion ready flag. Sets at end of conversion. Clears by read or write of the Configuration register.
-FH (Bit 6) – Flag high bit. Read only. Sets when result is higher that TH register. Clears when Config register is
-read or when Latch bit is ‘0’ and the result goes bellow TH register.
-FL (Bit 5) – Flag low bit. Read only. Sets when result is lower that TL register. Clears when Config register is read
-or when Latch bit is ‘0’ and the result goes above TL register.
-L (Bit 4) – Latch bit. Read/write bit. Default ‘1’, Controls Latch/transparent functionality of FH and FL bits. When
+OVF (Bit 8) â€“ Overflow flag. When set the conversion result is overflown.
+CRF (Bit 7) â€“ Conversion ready flag. Sets at end of conversion. Clears by read or write of the Configuration register.
+FH (Bit 6) â€“ Flag high bit. Read only. Sets when result is higher that TH register. Clears when Config register is
+read or when Latch bit is â€˜0â€™ and the result goes bellow TH register.
+FL (Bit 5) â€“ Flag low bit. Read only. Sets when result is lower that TL register. Clears when Config register is read
+or when Latch bit is â€˜0â€™ and the result goes above TL register.
+L (Bit 4) â€“ Latch bit. Read/write bit. Default â€˜1â€™, Controls Latch/transparent functionality of FH and FL bits. When
 L = 1 the Alert pin works in window comparator mode with Latched functionality When L = 0 the Alert pin
 works in transparent mode and the two limit registers provide the hysteresis.
-Pol (Bit 3) – Polarity. Read/write bit. Default ‘0’, Controls the active state of the Alert pin. Pol = 0 means Alert
+Pol (Bit 3) â€“ Polarity. Read/write bit. Default â€˜0â€™, Controls the active state of the Alert pin. Pol = 0 means Alert
 active low.
-ME (Bit 2) – Exponent mask. In fixed range modes masks the exponent bits in the result register to “0000”.
-FC1 to FC0 - Fault count bits. Read/write bits. Default “00” - the first fault will trigger the alert pin.
+ME (Bit 2) â€“ Exponent mask. In fixed range modes masks the exponent bits in the result register to â€œ0000â€.
+FC1 to FC0 - Fault count bits. Read/write bits. Default â€œ00â€ - the first fault will trigger the alert pin.
 */
 
 void OPT_init(void);
