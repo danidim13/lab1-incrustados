@@ -1,4 +1,6 @@
 #include "configuracion.h"
+#include "HAL_OPT.hpp"
+#include "HAL_I2C.hpp"
 #include <msp.h>
 
 void ConfigPorts(){
@@ -10,7 +12,6 @@ void ConfigPorts(){
     P4->SEL0 = BIT3;
     P4->SEL1 = BIT3;
     P4->DIR &= ~BIT3;
-
 }
 
 /**
@@ -24,6 +25,19 @@ void ConfigTimer(){
     TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT1_IRQn,1);
     NVIC_EnableIRQ(T32_INT1_IRQn);
+    return;
+}
+
+/**
+ * Configuracion de sensor de luz
+ */
+void ConfigSensorLuz(){
+    /* Inicializa comunicacion I2C */
+    Init_I2C_GPIO();
+    I2C_init();
+
+    /* Inicializar sensor de luz */
+    OPT_init();
     return;
 }
 
