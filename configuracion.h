@@ -3,6 +3,7 @@
  *
  *  Created on: Apr 18, 2018
  *      Author: daniel
+ *
  */
 
 #ifndef CONFIGURACION_H_
