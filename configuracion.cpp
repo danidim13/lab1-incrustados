@@ -1,8 +1,13 @@
 #include "configuracion.h"
 #include "HAL_OPT.hpp"
 #include "HAL_I2C.hpp"
+#include "audio.h"
+
 uint16_t ADC14Result = 0U;
+
+
 static uint16_t g_u16AdcCount = 0U;
+static int raw_data_i = 0;
 
 void ConfigPorts(){
     // LED como salida
@@ -124,6 +129,11 @@ extern "C"
         ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC; // Start
 
         g_u16AdcCount++;
+
+        int16_t signed_result = (int16_t)ADC14Result;
+        signed_result -= MIC_ZERO;
+
+        g_16ipRawData->push_back(signed_result);
 
         // Cada segundo prender/apagar el led
         if (g_u16AdcCount >= 8621) {

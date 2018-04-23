@@ -25,6 +25,14 @@ int main(void)
 
     //Button l_pButton(BUTTONS1);
 
+    uint16_t size = 512;
+    uint16_t datos[512];
+
+    //g_u16pRawData = datos;
+    //g_u16RawDataSize = size;
+
+
+
     while (1)
     {
         /*

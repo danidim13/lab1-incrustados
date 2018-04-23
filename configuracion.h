@@ -10,6 +10,7 @@
 
 extern uint16_t ADC14Result;
 
+
 #ifndef CONFIGURACION_H_
 #define CONFIGURACION_H_
 
