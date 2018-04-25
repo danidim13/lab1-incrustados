@@ -35,6 +35,11 @@ Para armar todo el sistema se tiene que configurar correctamente:
  - [x] Botón
  - [ ] Sistema de reloj
  - [ ] Timer
- - [ ] Convertidor A/D
+ - [x] Convertidor A/D
  - [ ] LED(s) o pines de salida (aclarar con el profe?)
+
+## Estructura del Software
+
+### Clases
+
 
