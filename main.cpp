@@ -1,6 +1,7 @@
 #include "msp.h"
 #include "configuracion.h"
 #include "Button.hpp"
+#include "audio.h"
 
 
 
@@ -25,8 +26,8 @@ int main(void)
 
     //Button l_pButton(BUTTONS1);
 
-    uint16_t size = 512;
-    uint16_t datos[512];
+    //uint16_t size = 512;
+    //uint16_t datos[512];
 
     //g_u16pRawData = datos;
     //g_u16RawDataSize = size;
@@ -35,6 +36,11 @@ int main(void)
 
     while (1)
     {
+        if (HighAudioLevel()) {
+            P1->OUT |= BIT0;
+        } else {
+            P1->OUT &= ~BIT0;
+        }
         /*
         if (l_pButton.Pressed()) {
             P1->OUT |= BIT0;
