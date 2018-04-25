@@ -2,19 +2,42 @@
 #include "HAL_OPT.hpp"
 #include "HAL_I2C.hpp"
 #include "audio.h"
+#include <msp.h>
 
+// BIT1=Boton P1.1, BIT4=Boton P1.4
+//u16int_t g_u16SelectedButton = BIT4;
+uint16_t g_u16SelectedButton = BIT1;
 
 
 void ConfigPorts(){
     // LED como salida
     P1->DIR = BIT0;
     P1->OUT = BIT0 & BIT1;
+    
+    // Configurar resistencia pulldown y puerto como entrada (boton)
+    P1->DIR &= ~g_u16SelectedButton;
+    P1->REN |= g_u16SelectedButton;
+    P1->OUT |= ~g_u16SelectedButton;
+
+    // Interrupts habilitados, limpia interrupt flag,
+    // interrupt edge select en flanco de bajada
+    P1->IE |= g_u16SelectedButton;
+    P1->IFG |= ~g_u16SelectedButton;
+    P1->IES |= ~g_u16SelectedButton;
 
     // Set P4.3 for Analog input, disabling the I/O circuit.
     // P4.3 (micrófono) Como entrada.
     P4->SEL0 = BIT3;
     P4->SEL1 = BIT3;
     P4->DIR &= ~BIT3;
+}
+
+/**
+ * Configuración del botón
+ */
+void ConfigButton(){
+    NVIC_SetPriority(PORT1_IRQn,1);
+    NVIC_EnableIRQ(PORT1_IRQn);
 }
 
 /**
@@ -102,6 +125,29 @@ void ConfigADC(){
 
 extern "C"
 {
+    
+/*
+* Atencion de interrupcion puerto 1
+*/
+void PORT1_IRQHandler(void)
+    {
+    __disable_irq();
+    //Comprueba fuente de interrupcion P1.BITx
+    if (P1->IFG and g_u16SelectedButton){
+        //if Boton pulsado, IES por flanco de bajada
+        // else, IES flanco de subida
+        if (P1->IN and g_u16SelectedButton){
+            P1->IES |= g_u16SelectedButton;
+        } else {
+            P1->IES |= ~g_u16SelectedButton;
+        }
+        //limpia flag de interrupcion
+        P1->IFG |= ~g_u16SelectedButton;
+    }
+    __enable_irq();
+    return;
+    }
+    
     /*
     void T32_INT1_IRQHandler(void)
     {
