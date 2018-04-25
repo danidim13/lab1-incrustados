@@ -3,11 +3,7 @@
 #include "HAL_I2C.hpp"
 #include "audio.h"
 
-uint16_t ADC14Result = 0U;
 
-
-static uint16_t g_u16AdcCount = 0U;
-static int raw_data_i = 0;
 
 void ConfigPorts(){
     // LED como salida
@@ -76,7 +72,7 @@ void ConfigADC(){
      *      4 | 8 | 16 | 32 | [64] | 96 | 128 | 192
      *
      * ---> Periodo de muestreo = 85 us (11.718 kHz)
-     * ---> Tiempo total de conversión = 116 us (87 ciclos, 8.620 kHz)
+     * ---> Tiempo total de conversión = 116 us exactos (87 ciclos, 8.620 kHz)
      *
      *
      */
@@ -121,28 +117,7 @@ extern "C"
      * Atencion de interrupcion ADC
      *
      */
-    void ADC14_IRQHandler(void)
-    {
-        __disable_irq();
-        ADC14Result = ADC14->MEM[0];
-        ADC14->CLRIFGR0 = ADC14_CLRIFGR0_CLRIFG0;
-        ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC; // Start
 
-        g_u16AdcCount++;
-
-        int16_t signed_result = (int16_t)ADC14Result;
-        signed_result -= MIC_ZERO;
-
-        g_16ipRawData->push_back(signed_result);
-
-        // Cada segundo prender/apagar el led
-        if (g_u16AdcCount >= 8621) {
-            P1->OUT ^= BIT0;
-            g_u16AdcCount = 0;
-        }
-        __enable_irq();
-        return;
-    }
 }
 
 
