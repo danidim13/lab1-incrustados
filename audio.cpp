@@ -8,8 +8,12 @@ bool g_bHighAudio = false;
  * Almacena el valor absoluto de los datos leidos del sensor.
  * 432 mediciones --> 50.0112 ms
  */
+//static const int RAW_BUFF_S = 432;
+//static CircularBuffer<uint16_t> g_u16pRawData(RAW_BUFF_S);
+
+static uint32_t g_u32Avg432MicReadings = 0;
+static int g_iMicReadCount = 0;
 static const int RAW_BUFF_S = 432;
-static CircularBuffer<uint16_t> g_u16pRawData(RAW_BUFF_S);
 
 /**
  * Almacena el promedio de las últimas X mediciones.
@@ -22,12 +26,6 @@ static const int PRIMER_SEG = PROM_BUFF_S/5;
 
 
 static const int MIC_ZERO = 8192;
-
-
-
-static uint16_t g_u16AdcCount = 0U;
-
-
 
 
 
@@ -53,7 +51,7 @@ bool HighAudioLevel()
         l_iTotal = l_iTotal/PROM_BUFF_S;
         l_iPrimer = l_iPrimer/PRIMER_SEG;
 
-        l_bResult = (l_iPrimer > (10*l_iTotal));
+        l_bResult = (10*l_iPrimer > (11*l_iTotal));
     }
     return l_bResult;
 }
@@ -71,22 +69,20 @@ extern "C"
         ADC14->CLRIFGR0 = ADC14_CLRIFGR0_CLRIFG0;
         ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC; // Start
 
-        g_u16AdcCount++;
-
-        int16_t signed_result = (int16_t)ADC14Result;
+        int32_t signed_result = ADC14Result;
         signed_result -= MIC_ZERO;
 
-        g_u16pRawData.push_back(abs(signed_result));
+        //g_u16pRawData.push_back(abs(signed_result));
+        g_u32Avg432MicReadings += (uint32_t) abs(signed_result);
+        g_iMicReadCount++;
 
         // Si ya llenamos el buffer calculamos el promedio
-        if (g_u16pRawData.full()) {
-            uint32_t sum = 0;
-            for (int i = 0; i < g_u16pRawData.num_elem(); i++) {
-                sum += g_u16pRawData[i];
-            }
-            sum = sum/g_u16pRawData.num_elem();
+        if (g_iMicReadCount == RAW_BUFF_S) {
+
+            uint32_t sum = g_u32Avg432MicReadings/RAW_BUFF_S;
             g_u32pPromData.push_back(sum);
-            g_u16pRawData.clear();
+            g_u32Avg432MicReadings = 0;
+            g_iMicReadCount = 0;
         }
 
         /*
