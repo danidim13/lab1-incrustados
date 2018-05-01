@@ -54,6 +54,20 @@ public:
         return m_iNumElem;
     }
 
+    void clear()
+    {
+        m_iNumElem = 0;
+        m_iFront = 0;
+        m_iBack = 0;
+
+    }
+
+    bool full()
+    {
+        return m_iNumElem == m_iMaxSize;
+    }
+
+
     data_t& operator[] (int index)//;
     {
         int l_RealIndex = (m_iFront + index) % m_iMaxSize;
