@@ -8,27 +8,28 @@
 #ifndef CIRCULARBUFFER_HPP_
 #define CIRCULARBUFFER_HPP_
 
-template <typename T>
+template <typename data_t>
 class CircularBuffer
 {
 public:
-    typedef T data_t;
+    //typedef T data_t;
     CircularBuffer(int size) //;
     {
         m_iMaxSize = size;
+        m_pData = new data_t[size];
         m_iNumElem = 0;
         m_iFront = 0;
         m_iBack = 0;
-        m_Data = new data_t[size];
     }
+
     virtual ~CircularBuffer() //;
     {
-        delete[] m_Data;
+        delete[] m_pData;
     }
 
     void push_back(data_t i_iElem)//;
     {
-        m_Data[m_iBack] = i_iElem;
+        m_pData[m_iBack] = i_iElem;
         m_iBack = (m_iBack + 1) % m_iMaxSize;
 
         if (m_iNumElem == m_iMaxSize) {
@@ -43,7 +44,7 @@ public:
         if (m_iNumElem == 0)
             return 0;
 
-        data_t l_elem = m_Data[m_iFront];
+        data_t l_elem = m_pData[m_iFront];
         m_iFront = (m_iFront + 1) % m_iMaxSize;
         m_iNumElem--;
         return l_elem;
@@ -71,11 +72,11 @@ public:
     data_t& operator[] (int index)//;
     {
         int l_RealIndex = (m_iFront + index) % m_iMaxSize;
-        return m_Data[l_RealIndex];
+        return m_pData[l_RealIndex];
     }
 
 protected:
-    data_t *m_Data;
+    data_t *m_pData;
     int m_iMaxSize;
     int m_iFront;
     int m_iBack;
