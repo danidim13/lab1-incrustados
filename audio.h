@@ -18,5 +18,6 @@
  * de los últimos 5 segundos.
  */
 bool HighAudioLevel();
+void ResetAudioBuffer();
 
 #endif /* AUDIO_H_ */

@@ -51,11 +51,15 @@ bool HighAudioLevel()
         l_iTotal = l_iTotal/PROM_BUFF_S;
         l_iPrimer = l_iPrimer/PRIMER_SEG;
 
-        l_bResult = (10*l_iPrimer > (11*l_iTotal));
+        l_bResult = (10*l_iPrimer > (12*l_iTotal));
     }
     return l_bResult;
 }
 
+void ResetAudioBuffer()
+{
+    g_u32pPromData.clear();
+}
 extern "C"
 {
     /**
