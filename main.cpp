@@ -41,7 +41,7 @@ int main(void)
     //g_u16pRawData = datos;
     //g_u16RawDataSize = size;
 
-
+    StartupBlink();
 
     int lux = 0;
     while (1)

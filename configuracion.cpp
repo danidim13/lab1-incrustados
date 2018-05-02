@@ -142,7 +142,23 @@ void ConfigADC(){
     NVIC_EnableIRQ(ADC14_IRQn);
 }
 
+/**
+ * Función para parpadear LEDs al inicio del ciclo de operación
+ */
+void StartupBlink(){
 
+    uint8_t l_u8blinker = BIT0;
+    const short NUM_LOOPS = 3;
+
+    //Bucle para parpadear LED
+    for (int i = 0; i>NUM_LOOPS; i++){
+        P1->OUT ^= l_u8blinker;
+        _delay_cycles(1500); //1500 ciclos = 0.5s @ 3kHz
+    }
+
+    P1->OUT &= ~l_u8blinker; //apaga LED
+    return;
+}
 
 extern "C"
 {
