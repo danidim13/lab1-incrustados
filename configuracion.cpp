@@ -1,6 +1,6 @@
+#include <HAL_I2C.hpp>
+#include <HAL_OPT.hpp>
 #include "configuracion.h"
-#include "HAL_OPT.hpp"
-#include "HAL_I2C.hpp"
 #include "audio.h"
 #include <msp.h>
 
@@ -9,10 +9,24 @@
 uint16_t g_u16SelectedButton = BIT1;
 
 
+
 void ConfigPorts(){
+
+
     // LED como salida
-    P1->DIR = BIT0;
-    P1->OUT = BIT0 & BIT1;
+    P1->DIR |= BIT0;
+    P1->OUT |= BIT0;
+
+#ifdef LED_15_WATT
+    P2->DIR |= BIT6 | BIT4;
+    P5->DIR |= BIT6;
+#elif LED_10_WATT
+    P2->DIR |= BIT6 | BIT4;
+#elif LED_5_WATT
+    P2->DIR |= BIT6;
+#endif
+
+
     
     // Configurar resistencia pulldown y puerto como entrada (boton)
     P1->DIR &= ~g_u16SelectedButton;
@@ -64,6 +78,7 @@ void ConfigSensorLuz(){
 
     /* Inicializar sensor de luz */
     OPT_init();
+    __delay_cycles(1000);
     return;
 }
 

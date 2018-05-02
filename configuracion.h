@@ -11,6 +11,12 @@
 #include <msp.h>
 
 
+//#define LED_5_WATT 1
+#define LED_10_WATT 1
+//#define LED_15_WATT 1
+
+#define DAY_LUX 500
+
 void ConfigPorts();
 void ConfigTimer();
 void ConfigADC();

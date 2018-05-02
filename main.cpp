@@ -2,6 +2,37 @@
 #include "configuracion.h"
 #include "Button.hpp"
 #include "audio.h"
+#include "HAL_OPT.hpp"
+
+
+
+void LED_on()
+{
+#ifdef LED_15_WATT
+    P2->OUT |= BIT6 | BIT4;
+    P5->OUT |= BIT6;
+#elif LED_10_WATT
+    P2->OUT |= BIT6 | BIT4;
+#elif LED_5_WATT
+    P2->OUT |= BIT6 | BIT4;
+
+#endif
+    return;
+}
+
+void LED_off()
+{
+#ifdef LED_15_WATT
+    P2->OUT &= ~(BIT6 | BIT4);
+    P5->OUT &= ~BIT6;
+#elif LED_10_WATT
+    P2->OUT &= ~(BIT6 | BIT4);
+#elif LED_5_WATT
+    P2->OUT &= ~(BIT6 | BIT4);
+
+#endif
+    return;
+}
 
 
 
@@ -20,6 +51,8 @@ int main(void)
 
     ConfigADC();
 
+    ConfigSensorLuz();
+
     // Empezar conversión
     ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC;
 
@@ -34,12 +67,23 @@ int main(void)
 
 
 
+    int lux = 0;
     while (1)
     {
+
         if (HighAudioLevel()) {
             P1->OUT |= BIT0;
+
         } else {
             P1->OUT &= ~BIT0;
+        }
+
+        lux = OPT_getLux();
+        if (lux < DAY_LUX) {
+            LED_on();
+        }
+        else {
+            LED_off();
         }
         /*
         if (l_pButton.Pressed()) {
