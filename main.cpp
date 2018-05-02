@@ -23,10 +23,11 @@ int main(void)
     WDTCTL = WDTPW | WDTHOLD;                    /* Stop watchdog timer */
 
     ConfigPorts();
-
     ConfigADC();
-
     ConfigSensorLuz();
+    ConfigButton();
+
+    LED_off();
 
     // Empezar conversión
     ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC;
@@ -53,6 +54,7 @@ int main(void)
             P1->OUT &= ~BIT0;
         }
 
+        /*
         lux = OPT_getLux();
         if (lux < DAY_LUX) {
             LED_on();
@@ -60,6 +62,8 @@ int main(void)
         else {
             LED_off();
         }
+        */
+
         /*
         if (l_pButton.Pressed()) {
             P1->OUT |= BIT0;

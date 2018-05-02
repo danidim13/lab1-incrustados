@@ -13,9 +13,15 @@ uint16_t g_u16SelectedButton = BIT1;
 void ConfigPorts(){
 
 
-    // LED como salida
+    // LED1 como salida, inicialmente apagado
     P1->DIR |= BIT0;
-    P1->OUT |= BIT0;
+    P1->OUT &= ~BIT0;
+
+    // LED2 como salida, inicialmente apagado
+    P2->DIR |= BIT0;
+    P2->OUT &= ~BIT0;
+
+
 
 #ifdef LED_15_WATT
     P2->DIR |= BIT6 | BIT4;
@@ -148,16 +154,19 @@ void PORT1_IRQHandler(void)
     {
     __disable_irq();
     //Comprueba fuente de interrupcion P1.BITx
-    if (P1->IFG and g_u16SelectedButton){
+    if (P1->IFG & g_u16SelectedButton){
         //if Boton pulsado, IES por flanco de bajada
         // else, IES flanco de subida
-        if (P1->IN and g_u16SelectedButton){
+        if (P1->IN & g_u16SelectedButton){
             P1->IES |= g_u16SelectedButton;
         } else {
             P1->IES |= ~g_u16SelectedButton;
         }
+
+        P2->OUT ^= BIT0;
         //limpia flag de interrupcion
-        P1->IFG |= ~g_u16SelectedButton;
+        P1->IFG &= ~g_u16SelectedButton;
+
     }
     __enable_irq();
     return;
