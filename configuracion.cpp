@@ -67,8 +67,8 @@ void ConfigButton(){
 void ConfigTimer(){
     //TIMER32_1->LOAD = 0x00B71B00; //~0.5s ---> a 48Mhz
 
-    TIMER32_1->LOAD = 0x0000BB80; //~0.5s ---> a 48Mhz
-    TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
+    // 11.71854 kHz
+    TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_2 | TIMER32_CONTROL_ONESHOT | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT1_IRQn,1);
     NVIC_EnableIRQ(T32_INT1_IRQn);
     return;
@@ -166,7 +166,10 @@ void PORT1_IRQHandler(void)
             P1->IES |= ~g_u16SelectedButton;
         }
 
+        // LED
         P2->OUT ^= BIT0;
+        TIMER32_1->LOAD = 11718;
+        P1->IE &= ~g_u16SelectedButton;
         //limpia flag de interrupcion
         P1->IFG &= ~g_u16SelectedButton;
 
@@ -175,16 +178,22 @@ void PORT1_IRQHandler(void)
     return;
     }
     
-    /*
+
     void T32_INT1_IRQHandler(void)
     {
         __disable_irq();
         TIMER32_1->INTCLR = 0U;
 
+        // Reactiva las interrupciones del boton y limpia cualquier
+        // pendiente
+        P1->IE |= g_u16SelectedButton;
+        P1->IFG &= ~g_u16SelectedButton;
+
+        P1->OUT ^= BIT0;
 
         __enable_irq();
         return;
-    }*/
+    }
 
     /**
      * Atencion de interrupcion ADC

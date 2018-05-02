@@ -26,6 +26,7 @@ int main(void)
     ConfigADC();
     ConfigSensorLuz();
     ConfigButton();
+    ConfigTimer();
 
     LED_off();
 
@@ -50,10 +51,10 @@ int main(void)
     {
 
         if (HighAudioLevel()) {
-            P1->OUT |= BIT0;
+            //P1->OUT |= BIT0;
 
         } else {
-            P1->OUT &= ~BIT0;
+            //P1->OUT &= ~BIT0;
         }
 
         /*
