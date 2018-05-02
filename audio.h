@@ -13,11 +13,10 @@
 #include "CircularBuffer.hpp"
 
 /**
- * Variable global que indica si el nivel del
+ * Función que indica si el nivel del
  * último segundo estuvo por encima del promedio
  * de los últimos 5 segundos.
  */
-//extern bool g_bHighAudio;
 bool HighAudioLevel();
 
 #endif /* AUDIO_H_ */
