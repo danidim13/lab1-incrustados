@@ -29,6 +29,10 @@ int main(void)
 
     LED_off();
 
+
+    StartupBlink();
+
+
     // Empezar conversión
     ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC;
 
@@ -40,8 +44,6 @@ int main(void)
 
     //g_u16pRawData = datos;
     //g_u16RawDataSize = size;
-
-    StartupBlink();
 
     int lux = 0;
     while (1)
