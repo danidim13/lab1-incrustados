@@ -11,5 +11,6 @@
 void LED_on();
 void LED_off();
 
+void StartupBlink();
 
 #endif /* LED_HPP_ */
