@@ -1,14 +1,13 @@
 #include <HAL_I2C.hpp>
 #include <HAL_OPT.hpp>
+#include <msp.h>
 #include "configuracion.h"
 #include "audio.h"
-#include <msp.h>
+#include "StateMachine.hpp"
 
 // BIT1=Boton P1.1, BIT4=Boton P1.4
 //u16int_t g_u16SelectedButton = BIT4;
 uint16_t g_u16SelectedButton = BIT1;
-
-
 
 void ConfigPorts(){
 
@@ -61,16 +60,21 @@ void ConfigButton(){
 }
 
 /**
- * Configuración del módulo de timer32
- * XX ms
+ * Timer32_1: supresión de rebotes.
+ * Timer32_2: contador de la luz.
+ *
  */
 void ConfigTimer(){
-    //TIMER32_1->LOAD = 0x00B71B00; //~0.5s ---> a 48Mhz
-
     // 11.71854 kHz
+
     TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_2 | TIMER32_CONTROL_ONESHOT | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT1_IRQn,1);
     NVIC_EnableIRQ(T32_INT1_IRQn);
+
+    TIMER32_2->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_2 | TIMER32_CONTROL_ONESHOT | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
+    NVIC_SetPriority(T32_INT2_IRQn,1);
+    NVIC_EnableIRQ(T32_INT2_IRQn);
+
     return;
 }
 
@@ -151,7 +155,7 @@ extern "C"
 {
     
 /*
-* Atencion de interrupcion puerto 1
+* Atencion de interrupcion puerto 1 (Boton)
 */
 void PORT1_IRQHandler(void)
     {
@@ -167,11 +171,16 @@ void PORT1_IRQHandler(void)
         }
 
         // LED
-        P2->OUT ^= BIT0;
-        TIMER32_1->LOAD = 11718;
+        //P2->OUT ^= BIT0;
+
+        // Supresion de rebotes
+        TIMER32_1->LOAD = 118; // 10 ms
         P1->IE &= ~g_u16SelectedButton;
         //limpia flag de interrupcion
         P1->IFG &= ~g_u16SelectedButton;
+
+        g_pMainControl.ButtonPressed();
+
 
     }
     __enable_irq();
@@ -189,11 +198,23 @@ void PORT1_IRQHandler(void)
         P1->IE |= g_u16SelectedButton;
         P1->IFG &= ~g_u16SelectedButton;
 
-        P1->OUT ^= BIT0;
+        //P1->OUT ^= BIT0;
 
         __enable_irq();
         return;
     }
+
+    void T32_INT2_IRQHandler(void)
+    {
+        __disable_irq();
+        TIMER32_2->INTCLR = 0U;
+
+        g_pMainControl.CountdownFinished();
+
+        __enable_irq();
+        return;
+    }
+
 
     /**
      * Atencion de interrupcion ADC

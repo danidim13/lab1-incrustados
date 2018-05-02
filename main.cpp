@@ -4,9 +4,7 @@
 #include "audio.h"
 #include "HAL_OPT.hpp"
 #include "LED.hpp"
-
-
-
+#include "StateMachine.hpp"
 
 
 
@@ -15,6 +13,7 @@
  * main.c
  */
 
+StateMachine g_pMainControl;
 
 int main(void)
 {
@@ -27,55 +26,13 @@ int main(void)
     ConfigSensorLuz();
     ConfigButton();
     ConfigTimer();
-
     LED_off();
-
-
-    StartupBlink();
-
 
     // Empezar conversión
     ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC;
 
 
-    //Button l_pButton(BUTTONS1);
+    g_pMainControl.Run();
 
-    //uint16_t size = 512;
-    //uint16_t datos[512];
-
-    //g_u16pRawData = datos;
-    //g_u16RawDataSize = size;
-
-    int lux = 0;
-    while (1)
-    {
-
-        if (HighAudioLevel()) {
-            //P1->OUT |= BIT0;
-
-        } else {
-            //P1->OUT &= ~BIT0;
-        }
-
-        /*
-        lux = OPT_getLux();
-        if (lux < DAY_LUX) {
-            LED_on();
-        }
-        else {
-            LED_off();
-        }
-        */
-
-        /*
-        if (l_pButton.Pressed()) {
-            P1->OUT |= BIT0;
-        } else {
-            P1->OUT &= ~BIT0;
-        }
-        */
-
-
-    }
     return 0;
 }
